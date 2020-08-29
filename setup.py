@@ -220,6 +220,11 @@ extension_modules = [
     ),
 ]
 
+# Only build extensions whose primary .pyx file exists
+available_extensions = [
+    ext for ext in extension_modules if os.path.exists(ext.sources[0])
+]
+
 directives = {
     "language_level": "3",
     "boundscheck": False,
@@ -230,10 +235,10 @@ directives = {
     "embedsignature": True,
 }
 
-if USE_CYTHON:
-    ext_modules = cythonize(extension_modules, compiler_directives=directives)
+if USE_CYTHON and available_extensions:
+    ext_modules = cythonize(available_extensions, compiler_directives=directives)
 else:
-    ext_modules = extension_modules
+    ext_modules = available_extensions
 
 setup(
     ext_modules=ext_modules,
