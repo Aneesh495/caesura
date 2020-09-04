@@ -5,7 +5,6 @@ Caesura Core Types and Native Signatures
 
 from libc.stdint cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t
 from libc.stddef cimport size_t
-from libcpp cimport bool
 
 cdef extern from "arena.h" nogil:
     ctypedef struct CaesuraArenaBlock:
@@ -62,16 +61,16 @@ cdef extern from "robin_hood.h" nogil:
     CaesuraPairMap* caesura_pair_map_create(size_t initial_capacity)
     void caesura_pair_map_destroy(CaesuraPairMap* map)
     void caesura_pair_map_clear(CaesuraPairMap* map)
-    bool caesura_pair_map_insert(CaesuraPairMap* map, uint64_t key, uint32_t rank, uint32_t token_id)
-    bool caesura_pair_map_get(const CaesuraPairMap* map, uint64_t key, uint32_t* out_rank, uint32_t* out_token_id)
-    bool caesura_pair_map_contains(const CaesuraPairMap* map, uint64_t key)
-    bool caesura_pair_map_remove(CaesuraPairMap* map, uint64_t key)
+    bint caesura_pair_map_insert(CaesuraPairMap* map, uint64_t key, uint32_t rank, uint32_t token_id)
+    bint caesura_pair_map_get(const CaesuraPairMap* map, uint64_t key, uint32_t* out_rank, uint32_t* out_token_id)
+    bint caesura_pair_map_contains(const CaesuraPairMap* map, uint64_t key)
+    bint caesura_pair_map_remove(CaesuraPairMap* map, uint64_t key)
     size_t caesura_pair_map_size(const CaesuraPairMap* map)
     size_t caesura_pair_map_capacity(const CaesuraPairMap* map)
 
 cdef extern from "simd_utf8.h" nogil:
     size_t caesura_scan_ascii(const uint8_t* ptr, size_t len)
-    bool caesura_validate_utf8(const uint8_t* ptr, size_t len)
+    bint caesura_validate_utf8(const uint8_t* ptr, size_t len)
     uint32_t caesura_utf8_next_codepoint(const uint8_t** ptr, size_t* len)
     size_t caesura_utf8_encode_codepoint(uint32_t cp, uint8_t* out_buf)
     size_t caesura_utf8_lead_len(uint8_t byte)
