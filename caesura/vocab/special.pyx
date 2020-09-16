@@ -36,6 +36,9 @@ cdef class SpecialTokenRegistry:
     cpdef object get_id(self, str token):
         return self._token_to_id.get(token, None)
 
+    cpdef str get_token(self, uint32_t token_id):
+        return self._id_to_token.get(token_id, None)
+
     cpdef object get_role_id(self, str role):
         cdef str token = self._role_to_token.get(role, None)
         if token:

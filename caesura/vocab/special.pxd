@@ -13,4 +13,5 @@ cdef class SpecialTokenRegistry:
     cpdef bint is_special_token(self, str token)
     cpdef bint is_special_id(self, uint32_t token_id)
     cpdef object get_id(self, str token)
+    cpdef str get_token(self, uint32_t token_id)
     cpdef object get_role_id(self, str role)
