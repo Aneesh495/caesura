@@ -61,6 +61,14 @@ cdef class SpecialTokenRegistry:
         return self._matcher.split_with_tokens(text)
 
     @property
+    def token_to_id(self) -> dict:
+        return dict(self._token_to_id)
+
+    @property
+    def role_to_token(self) -> dict:
+        return dict(self._role_to_token)
+
+    @property
     def bos_token_id(self):
         return self.get_role_id("bos")
 
