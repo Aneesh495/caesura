@@ -39,6 +39,7 @@ def encode(text, model_path):
     else:
         # Default Byte-level BPE model
         vocab = create_byte_vocab()
+        vocab.add_token(" ", 256)
         model = BpeModel(vocab=vocab)
         tok = Tokenizer(model=model, pre_tokenizer=whitespace_pre_tokenizer(keep_whitespace=True))
 
@@ -138,12 +139,13 @@ def benchmark(num_tokens):
     console.print(f"[bold cyan]Benchmarking Caesura subword engine with {num_tokens} tokens...[/bold cyan]")
 
     vocab = create_byte_vocab()
+    vocab.add_token(" ", 256)
     bpe = BpeModel(vocab=vocab)
-    for i in range(100):
-        bpe.add_merge("t", "h", rank=i * 2, merged_token="th")
-        bpe.add_merge("e", " ", rank=i * 2 + 1, merged_token="e ")
+    bpe.add_merge("t", "h", rank=0, merged_token="th")
+    bpe.add_merge("th", "e", rank=1, merged_token="the")
+    bpe.add_merge("the", " ", rank=2, merged_token="the ")
 
-    tok = Tokenizer(model=bpe, pre_tokenizer=whitespace_pre_tokenizer(keep_whitespace=True))
+    tok = Tokenizer(model=bpe, pre_tokenizer=None)
 
     sample_sentence = "the quick brown fox jumps over the lazy dog " * 20
     repeats = max(1, num_tokens // 200)
