@@ -46,6 +46,11 @@ def test_batch_encoding():
         [1, 1, 0],
     ]
 
+    # Test safe iteration and list conversion
+    items = list(batch)
+    assert len(items) == 2
+    assert items[0].ids == [1, 2, 3]
+
 
 def test_master_tokenizer_end_to_end():
     vocab = create_byte_vocab()

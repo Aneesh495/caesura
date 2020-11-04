@@ -66,7 +66,10 @@ cdef class BatchEncoding:
     def __len__(self) -> int:
         return len(self._encodings)
 
-    def __getitem__(self, size_t idx) -> Encoding:
+    def __iter__(self):
+        return iter(self._encodings)
+
+    def __getitem__(self, object idx) -> Encoding:
         return self._encodings[idx]
 
     def __repr__(self) -> str:
