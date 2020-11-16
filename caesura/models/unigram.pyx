@@ -4,6 +4,7 @@ Unigram Language Model with Dynamic Programming Lattice Decoder
 """
 
 import math
+from libc.stdint cimport uint32_t
 from caesura.vocab.vocab cimport Vocabulary
 
 cdef class UnigramModel:
@@ -31,8 +32,25 @@ cdef class UnigramModel:
             return self._unk_score
         return self._scores.get(<uint32_t>tid, self._unk_score)
 
+    cpdef double score_sequence(self, list ids):
+        """Compute cumulative log probability score for a sequence of token IDs."""
+        cdef double total = 0.0
+        cdef object tid
+        for tid in ids:
+            total += self._scores.get(<uint32_t>tid, self._unk_score)
+        return total
+
     cpdef list encode(self, str text):
         """Find globally optimal subword segmentation using Viterbi lattice decoding."""
+        cdef list offsets = self.encode_with_offsets(text)
+        cdef list tokens = []
+        cdef tuple item
+        for item in offsets:
+            tokens.append(item[0])
+        return tokens
+
+    cpdef list encode_with_offsets(self, str text):
+        """Find optimal subword segmentation with character start and end offsets."""
         if not text:
             return []
 
@@ -77,17 +95,21 @@ cdef class UnigramModel:
                 best_token[i + 1] = <uint32_t>tid
 
         # Viterbi backtrace
-        cdef list tokens = []
+        cdef list result = []
         cdef int curr = <int>n
         cdef int prev
         while curr > 0:
             prev = best_prev[curr]
-            tokens.append(best_token[curr])
+            result.append((best_token[curr], prev, curr))
             curr = prev
 
-        tokens.reverse()
-        return tokens
+        result.reverse()
+        return result
 
     @property
     def vocab(self) -> Vocabulary:
         return self._vocab
+
+    @property
+    def scores(self) -> dict:
+        return self._scores

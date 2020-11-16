@@ -10,4 +10,6 @@ cdef class UnigramModel:
     cdef double _unk_score
 
     cpdef list encode(self, str text)
+    cpdef list encode_with_offsets(self, str text)
     cpdef double score(self, str token)
+    cpdef double score_sequence(self, list ids)
