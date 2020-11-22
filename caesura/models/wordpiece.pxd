@@ -13,4 +13,6 @@ cdef class WordPieceModel:
     cdef size_t _max_input_chars_per_word
 
     cpdef list encode_word(self, str word)
-    cpdef list encode(self, list words)
+    cpdef list encode_word_with_offsets(self, str word, size_t word_offset=*)
+    cpdef list encode(self, object words)
+    cpdef list encode_with_offsets(self, object words)
