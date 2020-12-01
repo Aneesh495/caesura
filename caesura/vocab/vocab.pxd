@@ -11,3 +11,5 @@ cdef class Vocabulary:
     cpdef object get_id(self, str token)
     cpdef str get_token(self, uint32_t token_id)
     cpdef bint contains(self, str token)
+    cpdef dict invert(self)
+    cpdef void save_txt(self, str path)

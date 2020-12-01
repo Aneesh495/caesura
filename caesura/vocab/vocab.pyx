@@ -3,6 +3,7 @@
 Bi-Directional Vocabulary Mapping Engine
 """
 
+from libc.stdint cimport uint32_t
 from caesura.unicode.utf8 import ByteFallback
 
 cdef class Vocabulary:
@@ -52,6 +53,43 @@ cdef class Vocabulary:
 
     cpdef bint contains(self, str token):
         return token in self._token_to_id
+
+    cpdef dict invert(self):
+        """Return inverted mapping of token ID to string token."""
+        cdef dict inv = {}
+        cdef uint32_t tid
+        cdef str tok
+        for tid, tok in enumerate(self._id_to_token):
+            if tok is not None:
+                inv[tid] = tok
+        return inv
+
+    cpdef void save_txt(self, str path):
+        """Save vocabulary to a line-separated text file (one token per line)."""
+        with open(path, "w", encoding="utf-8") as f:
+            for tok in self._id_to_token:
+                if tok is not None:
+                    f.write(tok + "\n")
+                else:
+                    f.write("\n")
+
+    @classmethod
+    def load_txt(cls, str path):
+        """Load vocabulary from a line-separated text file."""
+        v = cls()
+        with open(path, "r", encoding="utf-8") as f:
+            for line in f:
+                v.add_token(line.rstrip("\r\n"))
+        return v
+
+    def items(self):
+        return self._token_to_id.items()
+
+    def keys(self):
+        return self._token_to_id.keys()
+
+    def values(self):
+        return self._token_to_id.values()
 
     def to_dict(self) -> dict:
         return dict(self._token_to_id)
