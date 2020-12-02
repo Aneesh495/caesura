@@ -17,3 +17,4 @@ cdef class Trie:
     cdef void c_insert(self, const uint8_t* key, size_t key_len, uint32_t token_id) noexcept nogil
     cdef bint c_find(self, const uint8_t* key, size_t key_len, uint32_t* out_token_id) noexcept nogil
     cdef size_t c_longest_prefix(self, const uint8_t* key, size_t key_len, uint32_t* out_token_id) noexcept nogil
+    cdef void _fuzzy_dfs(self, int32_t node, bytes prefix, bytes target, list prev_row, list results, int max_edits)

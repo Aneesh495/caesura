@@ -5,6 +5,8 @@ Prefix Trie Implementation for Fast Subword Lexicon Lookups
 
 from libc.stdlib cimport malloc, realloc, free
 from libc.string cimport memset
+from libc.stdint cimport uint8_t, uint32_t, int32_t
+from libc.stddef cimport size_t
 
 cdef class Trie:
     """
@@ -171,6 +173,102 @@ cdef class Trie:
         if match_len > 0:
             return (match_len, tid)
         return (0, None)
+
+    def keys_with_prefix(self, object prefix, size_t max_results=100) -> list:
+        """Find all stored keys starting with given prefix string or bytes."""
+        cdef bytes bpref
+        if isinstance(prefix, str):
+            bpref = prefix.encode("utf-8")
+        elif isinstance(prefix, bytes):
+            bpref = prefix
+        else:
+            return []
+
+        cdef const uint8_t* p = <const uint8_t*>bpref
+        cdef size_t l = len(bpref)
+        cdef int32_t curr = 0
+        cdef size_t i
+        cdef uint8_t b
+
+        for i in range(l):
+            b = p[i]
+            curr = self._nodes[curr].children[b]
+            if curr == -1:
+                return []
+
+        cdef list results = []
+        # DFS traversal from curr node using explicit stack
+        cdef list stack = [(curr, bytearray(bpref))]
+        cdef int32_t node_idx, child_idx
+        cdef bytearray path
+        cdef int c
+
+        while stack and len(results) < max_results:
+            node_idx, path = stack.pop()
+            if self._nodes[node_idx].is_terminal:
+                results.append((path.decode("utf-8", errors="replace"), self._nodes[node_idx].token_id))
+
+            for c in range(255, -1, -1):
+                child_idx = self._nodes[node_idx].children[c]
+                if child_idx != -1:
+                    new_path = bytearray(path)
+                    new_path.append(c)
+                    stack.append((child_idx, new_path))
+
+        return results
+
+    def fuzzy_search(self, str query, int max_edits=1) -> list:
+        """Find keys within maximum Levenshtein distance."""
+        cdef bytes bquery = query.encode("utf-8")
+        cdef size_t qlen = len(bquery)
+        cdef list current_row = list(range(qlen + 1))
+        cdef list results = []
+
+        cdef int c
+        cdef int32_t child_idx
+        for c in range(256):
+            child_idx = self._nodes[0].children[c]
+            if child_idx != -1:
+                self._fuzzy_dfs(child_idx, bytes([c]), bquery, current_row, results, max_edits)
+
+        return results
+
+    cdef void _fuzzy_dfs(
+        self,
+        int32_t node,
+        bytes prefix,
+        bytes target,
+        list prev_row,
+        list results,
+        int max_edits,
+    ):
+        cdef size_t tlen = len(target)
+        cdef list cur_row = [prev_row[0] + 1]
+        cdef size_t i
+        cdef int insert_cost, delete_cost, replace_cost
+        cdef int c
+        cdef int32_t child
+        cdef int min_dist
+
+        cdef size_t plen = len(prefix)
+        cdef uint8_t last_char = prefix[plen - 1]
+
+        for i in range(1, tlen + 1):
+            insert_cost = cur_row[i - 1] + 1
+            delete_cost = prev_row[i] + 1
+            replace_cost = prev_row[i - 1] if last_char == target[i - 1] else prev_row[i - 1] + 1
+            cur_row.append(min(insert_cost, delete_cost, replace_cost))
+
+        min_dist = min(cur_row)
+        cdef int last_dist = cur_row[len(cur_row) - 1]
+        if last_dist <= max_edits and self._nodes[node].is_terminal:
+            results.append((prefix.decode("utf-8", errors="replace"), self._nodes[node].token_id, last_dist))
+
+        if min_dist <= max_edits:
+            for c in range(256):
+                child = self._nodes[node].children[c]
+                if child != -1:
+                    self._fuzzy_dfs(child, prefix + bytes([c]), target, cur_row, results, max_edits)
 
     def __contains__(self, object key) -> bool:
         return self.find(key) is not None
