@@ -6,3 +6,4 @@ cdef bint c_is_punctuation(uint32_t cp) noexcept nogil
 cdef bint c_is_alphanumeric(uint32_t cp) noexcept nogil
 cdef bint c_is_control(uint32_t cp) noexcept nogil
 cdef bint c_is_cjk(uint32_t cp) noexcept nogil
+cdef bint c_is_combining(uint32_t cp) noexcept nogil
