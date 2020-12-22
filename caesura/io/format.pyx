@@ -47,9 +47,9 @@ cdef class BinarySerializer:
             payload.extend(tok_bytes)
 
         # Write merges if BPE
-        if model_type == 1 and hasattr(tokenizer.model, "_pair_map"):
-            # If BPE model, iterate pair map
-            pass
+        if model_type == 1 and hasattr(tokenizer.model, "merges"):
+            for m in tokenizer.model.merges:
+                payload.extend(struct.pack("<IIII", m[0], m[1], m[2], m[3]))
 
         # Write special tokens
         for spec_tok, spec_id in tokenizer.special_tokens.token_to_id.items():
@@ -123,7 +123,12 @@ cdef class BinarySerializer:
 
         # Build model based on model_type
         if model_type == 1:
-            model = BpeModel(vocab=vocab)
+            bpe_model = BpeModel(vocab=vocab)
+            for _ in range(merges_count):
+                m_left, m_right, m_rank, m_merged = struct.unpack_from("<IIII", payload, cursor)
+                cursor += 16
+                bpe_model.add_merge(m_left, m_right, m_rank, m_merged)
+            model = bpe_model
         elif model_type == 2:
             model = WordPieceModel(vocab=vocab)
         else:

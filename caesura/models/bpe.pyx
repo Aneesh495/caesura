@@ -33,6 +33,7 @@ cdef class BpeModel:
         self._arena = MemoryArena(65536)
         self._unk_id = 0
         self._byte_fallback = byte_fallback
+        self._merges = []
 
     def __dealloc__(self):
         if self._pair_map != NULL:
@@ -63,6 +64,7 @@ cdef class BpeModel:
 
         cdef uint64_t key = ((<uint64_t>left_id) << 32) | (<uint64_t>right_id)
         caesura_pair_map_insert(self._pair_map, key, rank, merged_id)
+        self._merges.append((left_id, right_id, rank, merged_id))
 
     cdef size_t c_encode_chunk(
         self,
@@ -224,3 +226,7 @@ cdef class BpeModel:
     @property
     def num_merges(self) -> int:
         return caesura_pair_map_size(self._pair_map)
+
+    @property
+    def merges(self) -> list:
+        return list(self._merges)

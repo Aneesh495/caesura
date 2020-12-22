@@ -21,6 +21,7 @@ cdef class BpeModel:
     cdef MemoryArena _arena
     cdef uint32_t _unk_id
     cdef bint _byte_fallback
+    cdef list _merges
 
     cdef size_t c_encode_chunk(
         self,
