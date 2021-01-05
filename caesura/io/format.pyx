@@ -12,6 +12,8 @@ from caesura.models.bpe import BpeModel
 from caesura.models.wordpiece import WordPieceModel
 from caesura.models.unigram import UnigramModel
 from caesura.pipeline.tokenizer import Tokenizer
+from caesura.decoder.decoder import ByteLevelDecoder
+from caesura.regex.compiler import whitespace_pre_tokenizer
 
 # 64-byte Header definition
 MAGIC = b"CAESURA\x01"
@@ -147,4 +149,10 @@ cdef class BinarySerializer:
                 cursor += role_len
             spec.register(spec_tok, spec_id, role=role if role else None)
 
-        return Tokenizer(model=model, special_tokens=spec)
+        cdef object dec = None
+        cdef object pre_tok = None
+        if model_type == 1:
+            dec = ByteLevelDecoder()
+            pre_tok = whitespace_pre_tokenizer(keep_whitespace=True)
+
+        return Tokenizer(model=model, pre_tokenizer=pre_tok, decoder=dec, special_tokens=spec)
