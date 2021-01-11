@@ -1,0 +1,76 @@
+{
+  "version": "1.0",
+  "truncation": null,
+  "padding": null,
+  "added_tokens": [
+    {
+      "id": 0,
+      "content": "[PAD]",
+      "special": true
+    },
+    {
+      "id": 100,
+      "content": "[UNK]",
+      "special": true
+    },
+    {
+      "id": 101,
+      "content": "[CLS]",
+      "special": true
+    },
+    {
+      "id": 102,
+      "content": "[SEP]",
+      "special": true
+    },
+    {
+      "id": 103,
+      "content": "[MASK]",
+      "special": true
+    }
+  ],
+  "normalizer": null,
+  "pre_tokenizer": {
+    "type": "Whitespace"
+  },
+  "model": {
+    "type": "WordPiece",
+    "vocab": {
+      "[PAD]": 0,
+      "[UNK]": 100,
+      "[CLS]": 101,
+      "[SEP]": 102,
+      "[MASK]": 103,
+      "the": 104,
+      "of": 105,
+      "and": 106,
+      "in": 107,
+      "to": 108,
+      "was": 109,
+      "he": 110,
+      "is": 111,
+      "as": 112,
+      "for": 113,
+      "on": 114,
+      "with": 115,
+      "by": 116,
+      "at": 117,
+      "from": 118,
+      "his": 119,
+      "that": 120,
+      "not": 121,
+      "play": 122,
+      "##er": 123,
+      "##s": 124,
+      "##ing": 125,
+      "##ed": 126,
+      "##ly": 127,
+      "token": 128,
+      "##izer": 129,
+      "model": 130,
+      "learn": 131
+    },
+    "merges": []
+  },
+  "decoder": null
+}
