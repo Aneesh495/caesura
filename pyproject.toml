@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "A high-throughput subword tokenization, finite-state lexical analysis, and zero-copy text encoding engine in Cython"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
 authors = [
     { name = "Aneesh Krishna", email = "aneeshkrishnaparthasarathy@gmail.com" }
 ]
@@ -16,7 +16,6 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
